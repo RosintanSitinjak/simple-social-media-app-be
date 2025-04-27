@@ -9,6 +9,8 @@ import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
+import { AlatBeratModule } from './alat-berat/alat-berat.module';
+import { PemesananModule } from './pemesanan/pemesanan.module';
 
 @Module({
   imports: [
@@ -22,25 +24,28 @@ import { PostModule } from './post/post.module';
         port: configService.get<string>('POSTGRES_PORT')
           ? configService.get<number>('POSTGRES_PORT')
           : 5432,
-        password: configService.get<string>('POSTGRES_PASSWORD'),
         username: configService.get<string>('POSTGRES_USER'),
+        password: configService.get<string>('POSTGRES_PASSWORD'),
         database: configService.get<string>('POSTGRES_DATABASE'),
-        migrations: ['dist/migrations/*.js'],
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        ssl: {
+          rejectUnauthorized: false,
+        },
         autoLoadEntities: true,
-        ssl: true,
+        synchronize: true, // pastikan hanya di development, production harus false + migration
       }),
     }),
     AuthModule,
     UserModule,
-    PostModule
+    PostModule,
+    AlatBeratModule,
+    PemesananModule,
   ],
   controllers: [AppController],
   providers: [
+    AppService,
     ConfigService,
     JwtService,
     { provide: APP_GUARD, useClass: AuthGuard },
-    AppService,
   ],
 })
 export class AppModule {}
